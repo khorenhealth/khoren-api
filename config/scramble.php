@@ -64,14 +64,22 @@ Khoren API.
 
 ## Authentication
 
+**Email / password**
+
+- `POST /api/sign-up` — email, password, password_confirmation, terms (`true`)
+- `POST /api/sign-in` — email, password
+- `POST /api/logout` — Bearer token required
+
+**Google**
+
 1. Open `GET /auth/google/redirect` in a browser (or webview).
 2. Complete Google sign-in; Google returns to `GET /auth/google/callback`.
-3. Store the returned Sanctum `token`.
-4. Call protected routes with `Authorization: Bearer {token}`.
 
-OAuth is **stateless** (Socialite). Auth routes are rate-limited to 10 requests per minute.
+Store the returned Sanctum `token` and call protected routes with `Authorization: Bearer {token}`.
 
-For narrative detail (account linking rules, env setup), see `docs/google-authentication.md`.
+Auth sign-up/sign-in and Google routes are rate-limited to 10 requests per minute.
+
+For Google account-linking rules and env setup, see `docs/google-authentication.md`.
 MD,
     ],
 

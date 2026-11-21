@@ -4,7 +4,7 @@ Laravel API for Khoren. Served locally by [Laravel Herd](https://herd.laravel.co
 
 ## Features
 
-- **Google authentication** — Socialite OAuth + Sanctum API tokens
+- **Authentication** — email/password sign-up & sign-in, plus Google OAuth (Sanctum API tokens)
 
 ## API documentation (Scramble)
 

@@ -1,6 +1,8 @@
 # Google Authentication
 
 > **Interactive docs:** open [`/docs/api`](/docs/api) (Scramble / OpenAPI). This page is the narrative companion.
+>
+> Email/password sign-up and sign-in: `POST /api/sign-up`, `POST /api/sign-in`, `POST /api/logout` (same Sanctum token shape as Google).
 
 Stateless Google OAuth via [Laravel Socialite](https://laravel.com/docs/socialite), with API tokens from [Laravel Sanctum](https://laravel.com/docs/sanctum).
 
