@@ -31,6 +31,7 @@ class AuthenticatedSessionController extends Controller
         description: 'Authenticated. Store the token and send it as `Authorization: Bearer {token}`.',
         type: 'array{token: string, user: App\Http\Resources\UserResource}',
     )]
+    #[Response(403, description: 'The password is correct, but the email address is not verified.')]
     #[Response(422, description: 'Invalid credentials or validation failed.')]
     public function store(LoginRequest $request): JsonResponse
     {
@@ -40,6 +41,13 @@ class AuthenticatedSessionController extends Controller
             throw ValidationException::withMessages([
                 'email' => ['These credentials do not match our records.'],
             ]);
+        }
+
+        if ($user->email_verified_at === null) {
+            return response()->json([
+                'message' => 'Email address is not verified.',
+                'email' => $user->email,
+            ], 403);
         }
 
         return response()->json([

@@ -14,19 +14,16 @@ test('a guest can register with a valid email and password', function () {
     ]);
 
     $response->assertCreated()
-        ->assertJsonPath('user.email', 'youremail@gmail.com')
-        ->assertJsonPath('user.name', 'youremail')
-        ->assertJsonStructure(['token', 'user' => ['id', 'name', 'email', 'email_verified_at']]);
+        ->assertJsonPath('email', 'youremail@gmail.com')
+        ->assertJsonStructure(['email', 'expires_at', 'resend_available_at'])
+        ->assertJsonMissingPath('token');
 
     $user = User::query()->where('email', 'youremail@gmail.com')->first();
 
     expect($user)->not->toBeNull()
+        ->and($user->name)->toBe('youremail')
+        ->and($user->email_verified_at)->toBeNull()
         ->and($user->password)->not->toBeNull();
-
-    $this->withToken($response->json('token'))
-        ->getJson('/api/user')
-        ->assertOk()
-        ->assertJsonPath('data.email', 'youremail@gmail.com');
 });
 
 test('registration accepts an optional name', function () {
@@ -37,7 +34,21 @@ test('registration accepts an optional name', function () {
         'password_confirmation' => 'Secret1!',
         'terms' => true,
     ])->assertCreated()
-        ->assertJsonPath('user.name', 'Ada Lovelace');
+        ->assertJsonPath('email', 'ada@example.com');
+
+    expect(User::query()->where('email', 'ada@example.com')->value('name'))->toBe('Ada Lovelace');
+});
+
+test('registration ignores a client supplied verification timestamp', function () {
+    $this->postJson('/api/sign-up', [
+        'email' => 'youremail@gmail.com',
+        'password' => 'Secret1!',
+        'password_confirmation' => 'Secret1!',
+        'terms' => true,
+        'email_verified_at' => '2026-11-23T08:00:00.000000Z',
+    ])->assertCreated();
+
+    expect(User::query()->where('email', 'youremail@gmail.com')->first()?->email_verified_at)->toBeNull();
 });
 
 test('registration requires matching passwords', function () {

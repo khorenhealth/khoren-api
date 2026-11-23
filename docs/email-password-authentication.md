@@ -30,10 +30,65 @@ Accept: application/json
 | `terms` | must be accepted (`true` / `1` / `"yes"` / `"on"`) |
 | `name` | optional; defaults to the email local-part |
 
-**201** — `{ token, user }`  
+**201** — `{ email, expires_at, resend_available_at }`  
+No API token yet. A 6-digit code is emailed to `email`. It expires 10 minutes after it is sent. `resend_available_at` is 60 seconds after send.
+
 **422** — validation errors (e.g. `"Password doesn't match!"` on `password`)
 
-Rate limit: 10 / minute.
+Rate limit: 10 / minute (shared with sign-in).
+
+## Verify email
+
+```http
+POST /api/email/verify
+```
+
+```json
+{
+  "email": "youremail@gmail.com",
+  "code": "012345"
+}
+```
+
+**200** — `{ token, user }` with `email_verified_at` set  
+**422** — missing fields, or the code is incorrect, expired, or no longer valid after 5 wrong attempts
+
+## Resend code
+
+```http
+POST /api/email/resend
+```
+
+```json
+{
+  "email": "youremail@gmail.com"
+}
+```
+
+**200** — `{ email, expires_at, resend_available_at }` when a new code is sent  
+**200** — `{ message }` and no email when the address is unknown or already verified  
+**429** — `{ message, resend_available_at }` while the countdown has not finished
+
+## Change email
+
+Only for an unverified account. The password is required so someone who only knows the address cannot move the account to their inbox.
+
+```http
+POST /api/email/change
+```
+
+```json
+{
+  "email": "youremail@gmail.com",
+  "password": "Secret1!",
+  "new_email": "other@example.com"
+}
+```
+
+**200** — `{ email, expires_at, resend_available_at }` for the new address, and a new code is emailed there  
+**422** — wrong password, `new_email` already taken, or the account is already verified
+
+Verify, resend, and change are limited to 10 requests per minute per email address and IP.
 
 ## Sign in
 
@@ -48,8 +103,9 @@ POST /api/sign-in
 }
 ```
 
-**200** — `{ token, user }`  
-**422** — invalid credentials (including Google-only accounts with no password)
+**200** — `{ token, user }` when the email is verified  
+**403** — `{ message, email }` when the password is correct but the email is not verified  
+**422** — invalid credentials (including a wrong password on an unverified account, and Google-only accounts with no password)
 
 ## Sign out
 
@@ -71,4 +127,8 @@ Authorization: Bearer {token}
 | Checklist (8+, upper, number, special) | server also requires a **lowercase** letter |
 | I Agree… | `terms: true` |
 | Sign Up | `POST /api/sign-up` |
+| Six code boxes | `code` on `POST /api/email/verify` |
+| Verify | `POST /api/email/verify` |
+| Didn't get a code? countdown | `resend_available_at`, then `POST /api/email/resend` |
+| Change email | `POST /api/email/change` with the account `password` and `new_email` |
 | Sign in link | `POST /api/sign-in` |
