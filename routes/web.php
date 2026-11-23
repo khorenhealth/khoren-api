@@ -4,7 +4,10 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'name' => config('app.name'),
+        'status' => 'ok',
+    ]);
 });
 
 Route::middleware('throttle:10,1')->group(function () {

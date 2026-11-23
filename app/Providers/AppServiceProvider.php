@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Scramble docs are local-only by default; allow them in production too.
+        // Tighten later (auth, IP allowlist) if the OpenAPI UI should not be public.
+        Gate::define('viewApiDocs', fn ($user = null): bool => true);
     }
 }
