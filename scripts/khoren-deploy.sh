@@ -50,6 +50,9 @@ $updates = [
     'SESSION_DRIVER' => 'file',
     'CACHE_STORE' => 'database',
     'QUEUE_CONNECTION' => 'database',
+    'MAIL_MAILER' => 'ses',
+    'MAIL_FROM_ADDRESS' => 'admin@trykhoren.com',
+    'AWS_DEFAULT_REGION' => 'eu-north-1',
 ];
 $format = function (string $key, string $value): string {
     if (preg_match('/[\s#\'"\\\\$]/', $value)) {

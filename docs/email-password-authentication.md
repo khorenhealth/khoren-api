@@ -31,7 +31,7 @@ Accept: application/json
 | `name` | optional; defaults to the email local-part |
 
 **201** — `{ email, expires_at, resend_available_at }`  
-No API token yet. A 6-digit code is emailed to `email`. It expires 10 minutes after it is sent. `resend_available_at` is 60 seconds after send.
+No API token yet. A 6-digit code is emailed to `email` through Amazon SES (`MAIL_MAILER=ses`, region `eu-north-1`). It expires 10 minutes after it is sent. `resend_available_at` is 60 seconds after send. `MAIL_FROM_ADDRESS` must be a verified SES identity.
 
 **422** — validation errors (e.g. `"Password doesn't match!"` on `password`)
 
