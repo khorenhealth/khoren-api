@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\EmailVerificationStatus;
+use App\Enums\EmailVerificationStatus;
 use App\Mail\EmailVerificationCode;
 use App\Models\User;
 use Illuminate\Support\Carbon;

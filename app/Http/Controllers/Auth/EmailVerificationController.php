@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\EmailVerificationStatus;
+use App\Enums\EmailVerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ChangeUnverifiedEmailRequest;
 use App\Http\Requests\Auth\ResendEmailVerificationRequest;
