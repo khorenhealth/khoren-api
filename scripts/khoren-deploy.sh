@@ -55,10 +55,9 @@ $updates = [
     'AWS_DEFAULT_REGION' => 'eu-north-1',
 ];
 $format = function (string $key, string $value): string {
-    if (preg_match('/[\s#\'"\\\\$]/', $value)) {
-        return $key . '="' . str_replace(['\\', '"'], ['\\\\', '\\"'], $value) . '"';
-    }
-    return $key . '=' . $value;
+    $escaped = str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
+
+    return $key."='".$escaped."'";
 };
 $seen = [];
 foreach ($lines as $i => $line) {
@@ -74,15 +73,18 @@ foreach ($updates as $key => $value) {
         $lines[] = $format($key, $value);
     }
 }
-file_put_contents($envPath, implode("\n", $lines) . "\n");
+if (file_put_contents($envPath, implode("\n", $lines)."\n") === false) {
+    fwrite(STDERR, "Failed to write .env\n");
+    exit(1);
+}
 PHP
 rm -f /tmp/rds-secret.json
 
 mkdir -p "$APP_DIR/storage/framework/"{cache,sessions,views} "$APP_DIR/storage/logs" "$APP_DIR/bootstrap/cache"
 cd "$APP_DIR"
 composer install --no-dev --optimize-autoloader --no-interaction
-php artisan migrate --force
 php artisan config:clear
+php artisan migrate --force
 php artisan route:clear
 php artisan view:clear
 php artisan config:cache
