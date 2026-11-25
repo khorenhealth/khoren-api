@@ -61,7 +61,7 @@ jobs:
 
       - name: Package release
         run: |
-          tar -czf khoren-api-latest.tar.gz \
+          tar -czf /tmp/khoren-api-latest.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.cursor' \
@@ -78,7 +78,7 @@ jobs:
             .
 
       - name: Upload artifact to S3
-        run: aws s3 cp khoren-api-latest.tar.gz "s3://${S3_BUCKET}/${S3_KEY}"
+        run: aws s3 cp /tmp/khoren-api-latest.tar.gz "s3://${S3_BUCKET}/${S3_KEY}"
 
       - name: Deploy on EC2 via SSM
         id: deploy
